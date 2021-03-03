@@ -1,4 +1,4 @@
-(defproject memoize-ttl "1.0.0"
+(defproject lsevero/memoize-ttl "1.0.0"
   :description "A simple caching TTL strategy"
   :url "https://github.com/lsevero/memoize-ttl"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"

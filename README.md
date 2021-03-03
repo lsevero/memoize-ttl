@@ -4,6 +4,7 @@ A `clojure.core/memoize` version with a time-to-live strategy.
 It mimics the interface of memoize and it is much more simplistic than [core.cache](https://github.com/clojure/core.cache).
 If you need more control on the cache, consider switching to core.cache instead.
 
+This library has no dependencies (besides clojure).
 ## Usage
 
 Just pass the function you want to memoize to `memoize-ttl`, this function also receives a :ttl optional argument in seconds (defaults to 1 hour).
