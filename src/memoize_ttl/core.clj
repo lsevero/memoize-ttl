@@ -61,16 +61,3 @@
      (fn [] (reset! mem {}))
      ]))
 
-(comment (def a (atom {:a 1}))
-         (find @a :a)
-         (pos?)
-       (> 1 (* 0.1 1e9))
-         
-         )
-
-
-
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
