@@ -1,5 +1,7 @@
 # memoize-ttl
 
+[![Clojars Project](https://img.shields.io/clojars/v/lsevero/memoize-ttl.svg)](https://clojars.org/lsevero/memoize-ttl)
+
 A `clojure.core/memoize` version with a time-to-live strategy.
 It mimics the interface of memoize and it is much more simplistic than [core.cache](https://github.com/clojure/core.cache).
 If you need more control on the cache, consider switching to core.cache instead.
