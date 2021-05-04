@@ -19,3 +19,12 @@
                 (reset! last-ret ret)))
           (Thread/sleep 1000)))
       (is (= @changes 2)))))
+
+(deftest memoize-ttl-parallel-start-test
+  (testing "testing parallel execution at start"
+    (is (every? (partial = 1) (doall (pmap (memoize-ttl (fn [x]
+                                                          (print x)
+                                                          x)) (repeat 10 1)))))
+    (is (= "1" (with-out-str (doall (pmap (memoize-ttl (fn [x]
+                                                         (print x)
+                                                         x)) (repeat 10 1))))))))

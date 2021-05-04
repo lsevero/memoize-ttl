@@ -20,15 +20,16 @@
   {:pre [(is (pos? ttl))]}
   (let [mem (atom {})]
     (fn [& args]
-      (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
-            now (System/nanoTime)]
-        (if (or (nil? entry)
-                (> (- now inst) (* 1000000000 ttl)))
-          (let [ret (apply f args)]
-            (swap! mem assoc args {:ret ret
-                                   :inst now})
-            ret)
-          ret)))))
+      (locking mem 
+        (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
+              now (System/nanoTime)]
+          (if (or (nil? entry)
+                  (> (- now inst) (* 1000000000 ttl)))
+            (let [ret (apply f args)]
+              (swap! mem assoc args {:ret ret
+                                     :inst now})
+              ret)
+            ret))))))
 
 (defn memoize-ttl-clean
   "Returns a vector of a memoized version of a referentially transparent function and a function to clean the cache.
@@ -49,15 +50,16 @@
   (let [mem (atom {})]
     [(let [mem (atom {})]
        (fn [& args]
-      (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
-            now (System/nanoTime)]
-        (if (or (nil? entry)
-                (> (- now inst) (* 1000000000 ttl)))
-          (let [ret (apply f args)]
-            (swap! mem assoc args {:ret ret
-                                   :inst now})
-            ret)
-          ret))))
+         (locking mem
+           (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
+                 now (System/nanoTime)]
+             (if (or (nil? entry)
+                     (> (- now inst) (* 1000000000 ttl)))
+               (let [ret (apply f args)]
+                 (swap! mem assoc args {:ret ret
+                                        :inst now})
+                 ret)
+               ret)))))
      (fn [] (reset! mem {}))
      ]))
 
