@@ -18,7 +18,7 @@
   "
   [f & {:keys [ttl] :or {ttl 3600}}]
   {:pre [(is (pos? ttl))]}
-  (let [mem (atom {})]
+  (let [mem (atom (transient {}))]
     (fn [& args]
       (locking mem 
         (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
@@ -26,8 +26,8 @@
           (if (or (nil? entry)
                   (> (- now inst) (* 1000000000 ttl)))
             (let [ret (apply f args)]
-              (swap! mem assoc args {:ret ret
-                                     :inst now})
+              (swap! mem assoc! args {:ret ret
+                                      :inst now})
               ret)
             ret))))))
 
@@ -36,7 +36,7 @@
   The memoized version of the function keeps a cache of the mapping from arguments
   to results and, when calls with the same arguments are repeated often, has
   higher performance at the expense of higher memory use.
-  
+
   The cache is invalidated after ttl seconds (defaults to 1 hour).
   TTL argument needs to be a positive number.
   If the function is called after the cache is invalidated the function will be called again and the cache will be updated.
@@ -47,19 +47,18 @@
   "
   [f & {:keys [ttl] :or {ttl 3600}}]
   {:pre [(is (pos? ttl))]}
-  (let [mem (atom {})]
-    [(let [mem (atom {})]
-       (fn [& args]
-         (locking mem
-           (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
-                 now (System/nanoTime)]
-             (if (or (nil? entry)
-                     (> (- now inst) (* 1000000000 ttl)))
-               (let [ret (apply f args)]
-                 (swap! mem assoc args {:ret ret
-                                        :inst now})
-                 ret)
-               ret)))))
-     (fn [] (reset! mem {}))
+  (let [mem (atom (transient {}))]
+    [(fn [& args]
+       (locking mem
+         (let [[_ {:keys [ret inst]} :as entry] (find @mem args)
+               now (System/nanoTime)]
+           (if (or (nil? entry)
+                   (> (- now inst) (* 1000000000 ttl)))
+             (let [ret (apply f args)]
+               (swap! mem assoc! args {:ret ret
+                                       :inst now})
+               ret)
+             ret))))
+     (fn [] (reset! mem (transient {})))
      ]))
 
